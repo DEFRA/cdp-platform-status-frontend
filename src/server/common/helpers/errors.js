@@ -23,6 +23,13 @@ export function catchAll(request, h) {
   }
 
   const statusCode = response.output.statusCode
+
+  // Let Basic auth challenges pass through untouched so the browser shows
+  // the native login dialog (WWW-Authenticate header must not be stripped)
+  if (statusCode === statusCodes.unauthorized) {
+    return h.continue
+  }
+
   const errorMessage = statusCodeMessage(statusCode)
 
   if (statusCode >= statusCodes.internalServerError) {

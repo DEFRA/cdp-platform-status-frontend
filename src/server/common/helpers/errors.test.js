@@ -45,9 +45,11 @@ describe('#catchAll', () => {
   })
   const mockToolkitView = vi.fn()
   const mockToolkitCode = vi.fn()
+  const mockContinue = Symbol('continue')
   const mockToolkit = {
     view: mockToolkitView.mockReturnThis(),
-    code: mockToolkitCode.mockReturnThis()
+    code: mockToolkitCode.mockReturnThis(),
+    continue: mockContinue
   }
 
   test('Should provide expected "Not Found" page', () => {
@@ -74,16 +76,14 @@ describe('#catchAll', () => {
     expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.forbidden)
   })
 
-  test('Should provide expected "Unauthorized" page', () => {
-    catchAll(mockRequest(statusCodes.unauthorized), mockToolkit)
+  test('Should pass through 401 Unauthorized to preserve WWW-Authenticate header for Basic auth browser dialog', () => {
+    const result = catchAll(mockRequest(statusCodes.unauthorized), mockToolkit)
 
-    expect(mockErrorLogger).not.toHaveBeenCalledWith(mockStack)
-    expect(mockToolkitView).toHaveBeenCalledWith(errorPage, {
-      pageTitle: 'Unauthorized',
-      heading: statusCodes.unauthorized,
-      message: 'Unauthorized'
-    })
-    expect(mockToolkitCode).toHaveBeenCalledWith(statusCodes.unauthorized)
+    expect(result).toBe(mockContinue)
+    expect(mockToolkitView).not.toHaveBeenCalledWith(
+      errorPage,
+      expect.objectContaining({ heading: statusCodes.unauthorized })
+    )
   })
 
   test('Should provide expected "Bad Request" page', () => {

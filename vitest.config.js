@@ -5,6 +5,9 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     clearMocks: true,
+    env: {
+      ADMIN_PASSWORD: 'test-password'
+    },
     coverage: {
       provider: 'v8',
       reportsDirectory: './coverage',
