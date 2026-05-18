@@ -1,4 +1,5 @@
 import { createServer } from '#/server/server.js'
+import { authHeader } from '#/test-helpers/auth-helpers.js'
 
 describe('#contentSecurityPolicy', () => {
   let server
@@ -15,7 +16,8 @@ describe('#contentSecurityPolicy', () => {
   test('Should set the CSP policy header', async () => {
     const resp = await server.inject({
       method: 'GET',
-      url: '/'
+      url: '/',
+      headers: { Authorization: authHeader }
     })
 
     expect(resp.headers['content-security-policy']).toBeDefined()

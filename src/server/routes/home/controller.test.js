@@ -1,5 +1,6 @@
 import { createServer } from '#/server/server.js'
 import { statusCodes } from '#/server/common/constants/status-codes.js'
+import { authHeader } from '#/test-helpers/auth-helpers.js'
 
 describe('#homeController', () => {
   let server
@@ -16,7 +17,8 @@ describe('#homeController', () => {
   test('Should provide expected response', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: '/'
+      url: '/',
+      headers: { Authorization: authHeader }
     })
 
     expect(result).toEqual(expect.stringContaining('Home |'))

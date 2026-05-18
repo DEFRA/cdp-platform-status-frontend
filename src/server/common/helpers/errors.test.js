@@ -3,6 +3,7 @@ import { vi } from 'vitest'
 import { catchAll } from './errors.js'
 import { createServer } from '../../server.js'
 import { statusCodes } from '../constants/status-codes.js'
+import { authHeader } from '#/test-helpers/auth-helpers.js'
 
 describe('#errors', () => {
   let server
@@ -19,7 +20,8 @@ describe('#errors', () => {
   test('Should provide expected Not Found page', async () => {
     const { result, statusCode } = await server.inject({
       method: 'GET',
-      url: '/non-existent-path'
+      url: '/non-existent-path',
+      headers: { Authorization: authHeader }
     })
 
     expect(result).toEqual(

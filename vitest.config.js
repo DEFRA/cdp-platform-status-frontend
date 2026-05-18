@@ -6,7 +6,8 @@ export default defineConfig({
     environment: 'node',
     clearMocks: true,
     env: {
-      ADMIN_PASSWORD: 'test-password'
+      ADMIN_PASSWORD: 'test-password',
+      PORT: '0'
     },
     coverage: {
       provider: 'v8',
