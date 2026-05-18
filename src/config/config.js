@@ -57,6 +57,22 @@ export const config = convict({
     default: '/public',
     env: 'ASSET_PATH'
   },
+  auth: {
+    username: {
+      doc: 'Basic auth username',
+      format: String,
+      default: 'admin',
+      env: 'ADMIN_USERNAME'
+    },
+    password: {
+      doc: 'Basic auth password as base64 value from Secrets Manager',
+      format: String,
+      default: null,
+      nullable: false,
+      env: 'ADMIN_PASSWORD',
+      sensitive: true
+    }
+  },
   isProduction: {
     doc: 'If this application running in the production environment',
     format: Boolean,

@@ -27,11 +27,19 @@ export const router = {
             appType: 'custom'
           })
 
-          await server.register({
-            plugin: (await import('@defra/hapi-connect')).default,
+          // auth: false so CSS/JS are not blocked by the default Basic auth strategy
+          server.route({
+            method: '*',
+            path: '/public/{param*}',
             options: {
-              path: '/public',
-              middleware: [vite.middlewares]
+              auth: false
+            },
+            handler: (request, h) => {
+              return new Promise((resolve) => {
+                vite.middlewares(request.raw.req, request.raw.res, () => {
+                  resolve(h.response().code(404))
+                })
+              })
             }
           })
         })()
