@@ -2,32 +2,35 @@ import Boom from '@hapi/boom'
 
 import { config } from '#/config/config.js'
 
-export async function callBackend(url, options = {}) {
+const getAuthToken = () => {
   const username = config.get('backendAuth.username')
   const password = config.get('backendAuth.password')
-  const token = Buffer.from(`${username}:${password}`).toString('base64')
+  return Buffer.from(`${username}:${password}`).toString('base64')
+}
 
+export async function callBackend(
+  url,
+  { method = 'GET', headers = {}, ...rest } = {}
+) {
   const response = await fetch(url, {
-    ...options,
-    method: options.method ?? 'GET',
+    method,
+    ...rest,
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Basic ${token}`,
-      ...(options.headers ?? {})
+      Authorization: `Basic ${getAuthToken()}`,
+      ...headers
     }
+  }).catch((error) => {
+    const reason = error.cause?.code ?? error.cause?.message ?? error.message
+    throw Boom.badGateway(`Backend request to ${url} failed: ${reason}`)
   })
 
-  let json = {}
+  const json = await response.json().catch((e) => {
+    console.warn(`Failed to parse JSON from ${url}:`, e.message)
+    return {}
+  })
 
-  try {
-    json = await response.json()
-  } catch {
-    json = {}
-  }
-
-  if (response.ok) {
-    return { response, json }
-  }
+  if (response.ok) return { response, json }
 
   throw Boom.boomify(new Error(json.message ?? 'Backend request failed'), {
     statusCode: response.status

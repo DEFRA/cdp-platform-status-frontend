@@ -22,5 +22,4 @@ describe('#callBackend', () => {
       output: { statusCode: 401 }
     })
   })
-
 })
