@@ -1,6 +1,9 @@
 import Boom from '@hapi/boom'
 
 import { config } from '#/config/config.js'
+import { createLogger } from '#/server/common/helpers/logging/logger.js'
+
+const logger = createLogger()
 
 const getAuthToken = () => {
   const username = config.get('backendAuth.username')
@@ -26,7 +29,7 @@ export async function callBackend(
   })
 
   const json = await response.json().catch((e) => {
-    console.warn(`Failed to parse JSON from ${url}:`, e.message)
+    logger.warn({ url, err: e }, 'Failed to parse JSON response from backend')
     return {}
   })
 
