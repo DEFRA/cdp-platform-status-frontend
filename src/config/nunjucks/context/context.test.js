@@ -69,6 +69,11 @@ describe('context and cache', () => {
               current: false,
               text: 'Large logs',
               href: '/logs'
+            },
+            {
+              current: false,
+              text: 'Kill switch',
+              href: '/kill'
             }
           ],
           serviceName: 'cdp-platform-status-frontend',
@@ -158,6 +163,11 @@ describe('context and cache', () => {
               current: false,
               text: 'Large logs',
               href: '/logs'
+            },
+            {
+              current: false,
+              text: 'Kill switch',
+              href: '/kill'
             }
           ],
           serviceName: 'cdp-platform-status-frontend',

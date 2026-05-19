@@ -18,6 +18,11 @@ describe('#buildNavigation', () => {
         current: false,
         text: 'Large logs',
         href: '/logs'
+      },
+      {
+        current: false,
+        text: 'Kill switch',
+        href: '/kill'
       }
     ])
   })
@@ -33,6 +38,11 @@ describe('#buildNavigation', () => {
         current: false,
         text: 'Large logs',
         href: '/logs'
+      },
+      {
+        current: false,
+        text: 'Kill switch',
+        href: '/kill'
       }
     ])
   })
@@ -48,6 +58,31 @@ describe('#buildNavigation', () => {
         current: true,
         text: 'Large logs',
         href: '/logs'
+      },
+      {
+        current: false,
+        text: 'Kill switch',
+        href: '/kill'
+      }
+    ])
+  })
+
+  test('Should highlight Kill switch nav item when on kill page', () => {
+    expect(buildNavigation(mockRequest({ path: '/kill' }))).toEqual([
+      {
+        current: false,
+        text: 'Home',
+        href: '/'
+      },
+      {
+        current: false,
+        text: 'Large logs',
+        href: '/logs'
+      },
+      {
+        current: true,
+        text: 'Kill switch',
+        href: '/kill'
       }
     ])
   })
