@@ -1,19 +1,13 @@
+export const navItems = [
+  { text: 'Home', href: '/' },
+  { text: 'Large logs', href: '/logs' },
+  { text: 'Kill switch', href: '/kill' }
+]
+
 export function buildNavigation(request) {
-  return [
-    {
-      text: 'Home',
-      href: '/',
-      current: request?.path === '/'
-    },
-    {
-      text: 'Large logs',
-      href: '/logs',
-      current: request?.path?.startsWith('/logs')
-    },
-    {
-      text: 'Kill switch',
-      href: '/kill',
-      current: request?.path?.startsWith('/kill')
-    }
-  ]
+  const path = request?.path ?? ''
+  return navItems.map((item) => ({
+    ...item,
+    current: path === item.href || (item.href !== '/' && path.startsWith(item.href))
+  }))
 }

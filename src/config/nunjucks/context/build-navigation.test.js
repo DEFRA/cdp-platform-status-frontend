@@ -1,10 +1,4 @@
-import { buildNavigation } from './build-navigation.js'
-
-const navItems = [
-  { text: 'Home', href: '/' },
-  { text: 'Large logs', href: '/logs' },
-  { text: 'Kill switch', href: '/kill' }
-]
+import { buildNavigation, navItems } from './build-navigation.js'
 
 function expectedNav(currentHref) {
   return navItems.map((item) => ({
