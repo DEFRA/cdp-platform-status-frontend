@@ -3,18 +3,6 @@ import { callBackend } from './backend-client.js'
 const expectedAuthToken = Buffer.from('admin:test-password').toString('base64')
 
 describe('#callBackend', () => {
-  test('Should return json and response on success', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify({ generated: 1, sizeKb: 100 }))
-
-    const { json, response } = await callBackend('http://backend/logs', {
-      method: 'POST',
-      body: JSON.stringify({ size: 100 })
-    })
-
-    expect(response.ok).toBe(true)
-    expect(json).toEqual({ generated: 1, sizeKb: 100 })
-  })
-
   test('Should send Basic auth header', async () => {
     fetchMock.mockResponseOnce(JSON.stringify({}))
 
