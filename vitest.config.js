@@ -7,8 +7,10 @@ export default defineConfig({
     clearMocks: true,
     env: {
       ADMIN_PASSWORD: 'test-password',
+      BACKEND_PASSWORD: 'test-password',
       PORT: '0'
     },
+    setupFiles: ['.vite/setup-files.js'],
     coverage: {
       provider: 'v8',
       reportsDirectory: './coverage',

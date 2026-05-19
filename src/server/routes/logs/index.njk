@@ -1,0 +1,63 @@
+{% extends 'layouts/page.njk' %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if successMessage %}
+        <div class="govuk-notification-banner govuk-notification-banner--success" role="alert">
+          <div class="govuk-notification-banner__content">
+            <p class="govuk-notification-banner__heading">{{ successMessage }}</p>
+          </div>
+        </div>
+      {% endif %}
+
+      {% if errorMessage %}
+        <div class="govuk-error-summary" role="alert">
+          <h2 class="govuk-error-summary__title">There is a problem</h2>
+          <div class="govuk-error-summary__body">
+            <p>{{ errorMessage }}</p>
+          </div>
+        </div>
+      {% endif %}
+
+      <form method="post" action="/logs">
+        <div class="govuk-form-group">
+          <label class="govuk-label" for="size">Message size in KB</label>
+          <input class="govuk-input govuk-input--width-5" id="size" name="size" type="number" min="1" max="1024" value="{{ formValues.size }}">
+        </div>
+
+        <div class="govuk-form-group">
+          <label class="govuk-label" for="fill">Message fill character</label>
+          <input class="govuk-input govuk-input--width-2" id="fill" name="fill" type="text" maxlength="1" value="{{ formValues.fill }}">
+        </div>
+
+        <div class="govuk-form-group">
+          <label class="govuk-label" for="count">How many messages</label>
+          <input class="govuk-input govuk-input--width-5" id="count" name="count" type="number" min="1" max="1000" value="{{ formValues.count }}">
+        </div>
+
+        <div class="govuk-form-group">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend">Message type</legend>
+            <div class="govuk-radios">
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="type-log" name="type" type="radio" value="log" {% if formValues.type == "log" %}checked{% endif %}>
+                <label class="govuk-label govuk-radios__label" for="type-log">Log</label>
+              </div>
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="type-audit" name="type" type="radio" value="audit" {% if formValues.type == "audit" %}checked{% endif %}>
+                <label class="govuk-label govuk-radios__label" for="type-audit">Audit</label>
+              </div>
+            </div>
+          </fieldset>
+        </div>
+
+        <button class="govuk-button" data-module="govuk-button" type="submit">Generate messages</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

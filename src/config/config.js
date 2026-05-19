@@ -57,6 +57,12 @@ export const config = convict({
     default: '/public',
     env: 'ASSET_PATH'
   },
+  backendUrl: {
+    doc: 'URL of the platform status backend',
+    format: String,
+    default: 'http://localhost:3101',
+    env: 'BACKEND_URL'
+  },
   auth: {
     username: {
       doc: 'Basic auth username',
@@ -65,11 +71,27 @@ export const config = convict({
       env: 'ADMIN_USERNAME'
     },
     password: {
-      doc: 'Basic auth password as base64 value from Secrets Manager',
+      doc: 'Basic auth password stored as a plain text secret in Secrets Manager',
       format: String,
       default: null,
       nullable: false,
       env: 'ADMIN_PASSWORD',
+      sensitive: true
+    }
+  },
+  backendAuth: {
+    username: {
+      doc: 'Backend basic auth username',
+      format: String,
+      default: 'admin',
+      env: 'BACKEND_USERNAME'
+    },
+    password: {
+      doc: 'Backend basic auth password stored as a plain text secret in Secrets Manager',
+      format: String,
+      default: null,
+      nullable: false,
+      env: 'BACKEND_PASSWORD',
       sensitive: true
     }
   },
