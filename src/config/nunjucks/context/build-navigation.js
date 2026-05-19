@@ -8,6 +8,7 @@ export function buildNavigation(request) {
   const path = request?.path ?? ''
   return navItems.map((item) => ({
     ...item,
-    current: path === item.href || (item.href !== '/' && path.startsWith(item.href))
+    current:
+      path === item.href || (item.href !== '/' && path.startsWith(item.href))
   }))
 }
