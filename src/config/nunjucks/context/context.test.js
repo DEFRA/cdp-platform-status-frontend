@@ -1,4 +1,12 @@
 import { vi } from 'vitest'
+import { navItems } from './build-navigation.js'
+
+function expectedNav(currentHref) {
+  return navItems.map((item) => ({
+    ...item,
+    current: item.href === currentHref
+  }))
+}
 
 const mockReadFileSync = vi.fn()
 const mockLoggerError = vi.fn()
@@ -59,18 +67,7 @@ describe('context and cache', () => {
           assetPath: '/public/assets',
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
-          navigation: [
-            {
-              current: true,
-              text: 'Home',
-              href: '/'
-            },
-            {
-              current: false,
-              text: 'Large logs',
-              href: '/logs'
-            }
-          ],
+          navigation: expectedNav('/'),
           serviceName: 'cdp-platform-status-frontend',
           serviceUrl: '/'
         })
@@ -148,18 +145,7 @@ describe('context and cache', () => {
           assetPath: '/public/assets',
           breadcrumbs: [],
           getAssetPath: expect.any(Function),
-          navigation: [
-            {
-              current: true,
-              text: 'Home',
-              href: '/'
-            },
-            {
-              current: false,
-              text: 'Large logs',
-              href: '/logs'
-            }
-          ],
+          navigation: expectedNav('/'),
           serviceName: 'cdp-platform-status-frontend',
           serviceUrl: '/'
         })

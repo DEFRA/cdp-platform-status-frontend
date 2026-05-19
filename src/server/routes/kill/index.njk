@@ -1,0 +1,78 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {{ govukWarningText({
+        text: "This will deliberately terminate the backend service.",
+        iconFallbackText: "Warning"
+      }) }}
+
+      {% if successMessage %}
+        {{ govukNotificationBanner({
+          type: "success",
+          html: "<p class=\"govuk-body\">" + successMessage + "</p>"
+        }) }}
+      {% endif %}
+
+      {% if errorMessage %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: [{ text: errorMessage }]
+        }) }}
+      {% endif %}
+
+      <form method="post" action="/kill">
+        {{ govukRadios({
+          name: "type",
+          fieldset: {
+            legend: {
+              text: "Choose kill mode",
+              classes: "govuk-fieldset__legend--m"
+            }
+          },
+          items: [
+            {
+              value: "exit",
+              text: "Clean exit — process.exit(1)",
+              checked: formValues.type == "exit"
+            },
+            {
+              value: "sigterm",
+              text: "SIGTERM — graceful shutdown (process stops)",
+              checked: formValues.type == "sigterm"
+            },
+            {
+              value: "oom",
+              text: "Out of memory crash",
+              checked: formValues.type == "oom"
+            },
+            {
+              value: "health",
+              text: "Health check failure — stop listening, process stays alive",
+              hint: {
+                text: "The port stops accepting connections. Health checks will fail and ECS will replace the task. Locally you must restart the server manually — there is no way to recover remotely."
+              },
+              checked: formValues.type == "health"
+            }
+          ]
+        }) }}
+
+        {{ govukButton({
+          text: "Trigger kill",
+          classes: "govuk-button--warning"
+        }) }}
+      </form>
+    </div>
+  </div>
+{% endblock %}
