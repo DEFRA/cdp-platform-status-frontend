@@ -67,8 +67,8 @@ describe('context and cache', () => {
             },
             {
               current: false,
-              text: 'About',
-              href: '/about'
+              text: 'Large logs',
+              href: '/logs'
             }
           ],
           serviceName: 'cdp-platform-status-frontend',
@@ -156,8 +156,8 @@ describe('context and cache', () => {
             },
             {
               current: false,
-              text: 'About',
-              href: '/about'
+              text: 'Large logs',
+              href: '/logs'
             }
           ],
           serviceName: 'cdp-platform-status-frontend',

@@ -6,9 +6,9 @@ export function buildNavigation(request) {
       current: request?.path === '/'
     },
     {
-      text: 'About',
-      href: '/about',
-      current: request?.path === '/about'
+      text: 'Large logs',
+      href: '/logs',
+      current: request?.path?.startsWith('/logs')
     }
   ]
 }
