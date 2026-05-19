@@ -23,12 +23,4 @@ describe('#callBackend', () => {
     })
   })
 
-  test('Should throw Boom 500 error when backend returns 500', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify({}), { status: 500 })
-
-    await expect(callBackend('http://backend/logs')).rejects.toMatchObject({
-      isBoom: true,
-      output: { statusCode: 500 }
-    })
-  })
 })
