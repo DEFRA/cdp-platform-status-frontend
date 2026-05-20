@@ -17,8 +17,9 @@ function applyChecks(data) {
 function markAllDown(names) {
   names.forEach((name) => {
     const el = document.querySelector(`[data-check="${name}"]`)
-    if (el)
-      {el.innerHTML = '<strong class="govuk-tag govuk-tag--red">DOWN</strong>'}
+    if (el) {
+      el.innerHTML = '<strong class="govuk-tag govuk-tag--red">DOWN</strong>'
+    }
   })
 }
 
