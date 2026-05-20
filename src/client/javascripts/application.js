@@ -14,3 +14,12 @@ createAll(ErrorSummary)
 createAll(Header)
 createAll(Radios)
 createAll(SkipLink)
+
+const modules = {
+  'status-dashboard': () => import('./status-dashboard.js')
+}
+
+document.querySelectorAll('[data-module]').forEach((el) => {
+  const load = modules[el.dataset.module]
+  if (load) load().then((m) => m.init(el))
+})

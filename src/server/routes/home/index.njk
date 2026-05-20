@@ -7,10 +7,33 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <div class="govuk-body" data-testid="app-page-body">
-        <p></p>
-      </div>
+      <dl class="govuk-summary-list" data-module="status-dashboard">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Frontend to backend</dt>
+          <dd class="govuk-summary-list__value" data-check="backend">
+            <span class="govuk-hint">Checking&hellip;</span>
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">MongoDB</dt>
+          <dd class="govuk-summary-list__value" data-check="mongo">
+            <span class="govuk-hint">Checking&hellip;</span>
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Redis</dt>
+          <dd class="govuk-summary-list__value" data-check="redis">
+            <span class="govuk-hint">Checking&hellip;</span>
+          </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key">Squid proxy</dt>
+          <dd class="govuk-summary-list__value" data-check="squid">
+            <span class="govuk-hint">Checking&hellip;</span>
+          </dd>
+        </div>
+      </dl>
     </div>
   </div>
-
 {% endblock %}
+
