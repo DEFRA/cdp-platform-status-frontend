@@ -1,0 +1,25 @@
+@use "govuk-frontend" as *;
+
+.app-status-ops {
+  @include govuk-font($size: 16);
+  list-style: none;
+  padding-left: 0;
+  margin-top: govuk-spacing(1);
+  margin-bottom: 0;
+}
+
+.app-status-ops__item {
+  display: flex;
+  align-items: center;
+  gap: govuk-spacing(1);
+
+  & + * {
+    margin-top: 2px;
+  }
+}
+
+.app-status-ops__label {
+  width: 5rem;
+  flex-shrink: 0;
+  color: govuk-colour("dark-grey");
+}
