@@ -1,5 +1,8 @@
 import { checkRedis } from '#/server/checks/redis.js'
-import { checkBackend, makeBackendCheckController } from '#/server/checks/backend.js'
+import {
+  checkBackend,
+  makeBackendCheckController
+} from '#/server/checks/backend.js'
 
 export const homeController = {
   handler(_request, h) {

@@ -7,8 +7,7 @@ function renderCheck(result) {
   const ops = result.operations
     ? `<ul class="app-status-ops">${Object.entries(result.operations)
         .map(([op, state]) => {
-          const colour =
-            state === 'ok' ? 'govuk-tag--green' : 'govuk-tag--red'
+          const colour = state === 'ok' ? 'govuk-tag--green' : 'govuk-tag--red'
           return `<li class="app-status-ops__item"><span class="app-status-ops__label">${op}</span><strong class="govuk-tag ${colour}">${state}</strong></li>`
         })
         .join('')}</ul>`

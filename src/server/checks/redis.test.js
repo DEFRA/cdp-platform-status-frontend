@@ -28,7 +28,9 @@ describe('#checkRedis', () => {
 
   test('Should return fail with write:fail and read:fail when set throws', async () => {
     buildRedisClient.mockReturnValue(
-      mockRedis({ set: vi.fn().mockRejectedValue(new Error('Connection refused')) })
+      mockRedis({
+        set: vi.fn().mockRejectedValue(new Error('Connection refused'))
+      })
     )
 
     expect(await checkRedis(request)).toEqual({
