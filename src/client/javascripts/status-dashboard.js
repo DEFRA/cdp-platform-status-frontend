@@ -1,18 +1,27 @@
 function renderCheck(result) {
   const isOk = result.status === 'ok'
-  const tag = `<strong class="govuk-tag ${isOk ? 'govuk-tag--green' : 'govuk-tag--red'}">${isOk ? 'UP' : 'DOWN'}</strong>`
+  const ops = result.operations
+  const isPartial = !isOk && ops && Object.values(ops).some((s) => s === 'ok')
+
+  const tagClass = isOk
+    ? 'govuk-tag--green'
+    : isPartial
+      ? 'govuk-tag--orange'
+      : 'govuk-tag--red'
+  const tagText = isOk ? 'UP' : isPartial ? 'DEGRADED' : 'DOWN'
+  const tag = `<strong class="govuk-tag ${tagClass}">${tagText}</strong>`
   const hint = result.reason
     ? `<p class="govuk-hint govuk-!-margin-top-1">${result.reason}</p>`
     : ''
-  const ops = result.operations
-    ? `<ul class="app-status-ops">${Object.entries(result.operations)
+  const opsList = ops
+    ? `<ul class="app-status-ops">${Object.entries(ops)
         .map(([op, state]) => {
           const colour = state === 'ok' ? 'govuk-tag--green' : 'govuk-tag--red'
           return `<li class="app-status-ops__item"><span class="app-status-ops__label">${op}</span><strong class="govuk-tag ${colour}">${state}</strong></li>`
         })
         .join('')}</ul>`
     : ''
-  return tag + hint + ops
+  return tag + hint + opsList
 }
 
 function applyChecks(data) {

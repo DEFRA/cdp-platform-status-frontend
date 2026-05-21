@@ -1,5 +1,16 @@
 import { vi } from 'vitest'
-import { runWithTimeout, timeoutMs } from './helpers.js'
+import { normalizeError, runWithTimeout, timeoutMs } from './helpers.js'
+
+describe('#normalizeError', () => {
+  test('Should return message when given an Error', () => {
+    expect(normalizeError(new Error('something broke'))).toBe('something broke')
+  })
+
+  test('Should stringify non-Error values', () => {
+    expect(normalizeError('plain string')).toBe('plain string')
+    expect(normalizeError(42)).toBe('42')
+  })
+})
 
 describe('#runWithTimeout', () => {
   test('Should resolve with the task result when task completes in time', async () => {
