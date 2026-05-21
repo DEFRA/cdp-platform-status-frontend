@@ -42,24 +42,11 @@ describe('#apiRedisStatusController', () => {
     await server.stop({ timeout: 0 })
   })
 
-  test('Should return ok when Redis ping succeeds', async () => {
+  test('Should return ok when Redis read/write succeeds', async () => {
     buildRedisClient.mockReturnValue({
-      ping: vi.fn().mockResolvedValue('PONG'),
-      disconnect: vi.fn()
-    })
-
-    const { result, statusCode } = await server.inject({
-      method: 'GET',
-      url: '/api/redis-status'
-    })
-
-    expect(statusCode).toBe(statusCodes.ok)
-    expect(result).toEqual({ checks: { redis: { status: 'ok' } } })
-  })
-
-  test('Should return fail when Redis ping throws', async () => {
-    buildRedisClient.mockReturnValue({
-      ping: vi.fn().mockRejectedValue(new Error('Connection refused')),
+      set: vi.fn().mockResolvedValue('OK'),
+      get: vi.fn().mockResolvedValue('ok'),
+      del: vi.fn().mockResolvedValue(1),
       disconnect: vi.fn()
     })
 
@@ -70,7 +57,34 @@ describe('#apiRedisStatusController', () => {
 
     expect(statusCode).toBe(statusCodes.ok)
     expect(result).toEqual({
-      checks: { redis: { status: 'fail', reason: 'Connection refused' } }
+      checks: {
+        redis: { status: 'ok', operations: { write: 'ok', read: 'ok' } }
+      }
+    })
+  })
+
+  test('Should return fail when Redis set throws', async () => {
+    buildRedisClient.mockReturnValue({
+      set: vi.fn().mockRejectedValue(new Error('Connection refused')),
+      get: vi.fn(),
+      del: vi.fn(),
+      disconnect: vi.fn()
+    })
+
+    const { result, statusCode } = await server.inject({
+      method: 'GET',
+      url: '/api/redis-status'
+    })
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toEqual({
+      checks: {
+        redis: {
+          status: 'fail',
+          reason: 'Connection refused',
+          operations: { write: 'fail', read: 'fail' }
+        }
+      }
     })
   })
 })
@@ -166,5 +180,37 @@ describe('#apiMongoStatusController', () => {
     expect(result).toEqual({
       checks: { mongo: { status: 'fail', reason: 'Missing mongo check' } }
     })
+  })
+})
+
+describe('#backend-proxied status controllers', () => {
+  let server
+
+  beforeAll(async () => {
+    server = await createServer()
+    await server.initialize()
+  })
+
+  afterAll(async () => {
+    await server.stop({ timeout: 0 })
+  })
+
+  test.each([
+    ['/api/squid-status', 'squid'],
+    ['/api/s3-status', 's3'],
+    ['/api/sqs-status', 'sqs'],
+    ['/api/sns-status', 'sns']
+  ])('Should return %s check from backend', async (path, checkKey) => {
+    fetchMock.mockResponseOnce(
+      JSON.stringify({ checks: { [checkKey]: { status: 'ok' } } })
+    )
+
+    const { result, statusCode } = await server.inject({
+      method: 'GET',
+      url: path
+    })
+
+    expect(statusCode).toBe(statusCodes.ok)
+    expect(result).toEqual({ checks: { [checkKey]: { status: 'ok' } } })
   })
 })

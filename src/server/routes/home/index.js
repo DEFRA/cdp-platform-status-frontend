@@ -3,7 +3,10 @@ import {
   apiRedisStatusController,
   apiBackendStatusController,
   apiMongoStatusController,
-  apiSquidStatusController
+  apiSquidStatusController,
+  apiS3StatusController,
+  apiSqsStatusController,
+  apiSnsStatusController
 } from './controller.js'
 
 /**
@@ -54,6 +57,30 @@ export const home = {
             auth: false
           },
           ...apiSquidStatusController
+        },
+        {
+          method: 'GET',
+          path: '/api/s3-status',
+          options: {
+            auth: false
+          },
+          ...apiS3StatusController
+        },
+        {
+          method: 'GET',
+          path: '/api/sqs-status',
+          options: {
+            auth: false
+          },
+          ...apiSqsStatusController
+        },
+        {
+          method: 'GET',
+          path: '/api/sns-status',
+          options: {
+            auth: false
+          },
+          ...apiSnsStatusController
         }
       ])
     }
