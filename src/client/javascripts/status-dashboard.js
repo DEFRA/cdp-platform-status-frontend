@@ -1,8 +1,7 @@
 function renderCheck(result) {
   const isOk = result.status === 'ok'
   const ops = result.operations
-  const isPartial =
-    !isOk && ops && Object.values(ops).some((s) => s === 'ok')
+  const isPartial = !isOk && ops && Object.values(ops).some((s) => s === 'ok')
 
   const tagClass = isOk
     ? 'govuk-tag--green'
