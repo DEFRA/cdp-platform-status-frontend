@@ -1,15 +1,15 @@
 export function init(el) {
-  const pre = el.querySelector('pre')
-  const btn = el.querySelector('button[data-copy]')
+  const textarea = el.querySelector('textarea')
+  const copyBtn = el.querySelector('button[data-copy]')
 
-  btn?.addEventListener('click', () => {
+  copyBtn?.addEventListener('click', () => {
     navigator.clipboard
-      .writeText(pre?.textContent ?? '')
+      .writeText(textarea?.value ?? '')
       .then(() => {
-        btn.textContent = 'Copied!'
+        copyBtn.textContent = 'Copied!'
       })
       .catch(() => {
-        btn.textContent = 'Copy failed'
+        copyBtn.textContent = 'Copy failed'
       })
   })
 }

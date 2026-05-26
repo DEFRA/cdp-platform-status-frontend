@@ -1,11 +1,15 @@
 .app-code-block {
+  display: block;
+  width: 100%;
+  min-height: 200px;
   max-height: 400px;
-  max-width: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  white-space: pre-wrap;
-  word-break: break-all;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  overflow-x: auto;
+  font-family: monospace;
+  font-size: 0.875rem;
+  background: transparent;
+  resize: both;
+  box-sizing: border-box;
 
   &--bordered {
     border: 1px solid #b1b4b6;
