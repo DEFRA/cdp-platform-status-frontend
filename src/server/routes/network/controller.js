@@ -44,7 +44,9 @@ async function handleHttpCheck(request, h) {
       httpUrl: url,
       httpResult: {
         ...json,
-        headersText: JSON.stringify(json.headers ?? {}, null, 2),
+        headersText: Object.entries(json.headers ?? {})
+          .map(([k, v]) => `${k}: ${v}`)
+          .join('\n'),
         totalMs: Math.round(performance.now() - start)
       }
     })
