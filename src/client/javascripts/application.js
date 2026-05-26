@@ -16,7 +16,8 @@ createAll(Radios)
 createAll(SkipLink)
 
 const modules = {
-  'status-dashboard': () => import('./status-dashboard.js')
+  'status-dashboard': () => import('./status-dashboard.js'),
+  'copy-text': () => import('./copy-text.js')
 }
 
 document.querySelectorAll('[data-module]').forEach((el) => {

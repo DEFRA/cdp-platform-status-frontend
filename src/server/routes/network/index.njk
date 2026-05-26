@@ -1,0 +1,227 @@
+{% extends 'layouts/page.njk' %}
+
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% block content %}
+  {{ appHeading({
+    text: heading
+  }) }}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+      {# ── HTTP CHECK ───────────────────────────────────────────────────── #}
+      <h2 class="govuk-heading-m" id="http-result">HTTP check</h2>
+      <p class="govuk-body">Make a GET request from the protected backend zone.</p>
+
+      {% if httpResult %}
+        {% if httpResult.squidBlocked %}
+          {{ govukNotificationBanner({
+            type: "warning",
+            html: "<p class=\"govuk-body\"><strong>Squid proxy blocked this request (307)</strong></p><p class=\"govuk-body\">The backend has no proxy ACL rule for this host. Add the domain to the <code>squid/cdp-platform-status-backend.json</code> config in <code>cdp-tenant-config</code>.</p>"
+          }) }}
+        {% elif httpResult.ok %}
+          {{ govukNotificationBanner({
+            type: "success",
+            html: "<p class=\"govuk-body\">Request completed in " + httpResult.totalMs + " ms</p>"
+          }) }}
+        {% else %}
+          {{ govukNotificationBanner({
+            type: "warning",
+            html: "<p class=\"govuk-body\">Request completed in " + httpResult.totalMs + " ms — non-success status</p>"
+          }) }}
+        {% endif %}
+      {% endif %}
+
+      {% if httpErrorMessage %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: [{ text: httpErrorMessage }]
+        }) }}
+      {% endif %}
+
+      <form method="post" action="/network#http-result" class="govuk-!-margin-bottom-6">
+        <input type="hidden" name="checkType" value="http">
+        {{ govukInput({
+          id: "url",
+          name: "url",
+          label: {
+            text: "URL",
+            classes: "govuk-label--s"
+          },
+          hint: {
+            text: "Must start with http:// or https://"
+          },
+          value: httpUrl
+        }) }}
+        {{ govukButton({
+          text: "Run check",
+          classes: "govuk-button--secondary"
+        }) }}
+      </form>
+
+      <div>
+        {% if httpResult %}
+          {{ govukSummaryList({
+            rows: [
+              {
+                key: { text: "Status" },
+                value: { text: httpResult.status + " " + httpResult.statusText }
+              },
+              {
+                key: { text: "Round trip" },
+                value: { text: httpResult.totalMs + " ms" }
+              }
+            ]
+          }) }}
+
+          <h3 class="govuk-heading-s">Response headers</h3>
+          {% if httpResult.headersText and httpResult.headersText != "{}" %}
+            <pre class="govuk-body govuk-!-margin-top-0 govuk-!-margin-bottom-6">{{ httpResult.headersText }}</pre>
+          {% else %}
+            <p class="govuk-body">No response headers.</p>
+          {% endif %}
+
+          {% if not httpResult.squidBlocked %}
+            <h3 class="govuk-heading-s">Response body</h3>
+            <div data-module="copy-text" class="govuk-!-margin-bottom-6">
+              <pre class="govuk-body govuk-!-margin-top-0 govuk-!-margin-bottom-2 app-code-block">{{ httpResult.body or "[empty]" }}</pre>
+              <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-copy>Copy body</button>
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+
+      <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+      {# ── DNS LOOKUP ───────────────────────────────────────────────────── #}
+      <h2 class="govuk-heading-m" id="dns-result">DNS lookup</h2>
+      <p class="govuk-body">Resolve A and AAAA records from the protected backend zone.</p>
+
+      {% if dnsResult %}
+        {% if dnsResult.ok %}
+          {{ govukNotificationBanner({
+            type: "success",
+            html: "<p class=\"govuk-body\">Resolved " + dnsResult.hostname + "</p>"
+          }) }}
+        {% else %}
+          {{ govukNotificationBanner({
+            type: "warning",
+            html: "<p class=\"govuk-body\">Could not resolve " + dnsResult.hostname + ": " + dnsResult.error + "</p>"
+          }) }}
+        {% endif %}
+      {% endif %}
+
+      {% if dnsErrorMessage %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: [{ text: dnsErrorMessage }]
+        }) }}
+      {% endif %}
+
+      <form method="post" action="/network#dns-result" class="govuk-!-margin-bottom-6">
+        <input type="hidden" name="checkType" value="dns">
+        {{ govukInput({
+          id: "hostname",
+          name: "hostname",
+          label: {
+            text: "Hostname",
+            classes: "govuk-label--s"
+          },
+          hint: {
+            text: "e.g. api.os.uk or storage.azure.com"
+          },
+          value: dnsHostname
+        }) }}
+        {{ govukButton({
+          text: "Lookup",
+          classes: "govuk-button--secondary"
+        }) }}
+      </form>
+
+      <div>
+        {% if dnsResult and (dnsResult.ipv4.length > 0 or dnsResult.ipv6.length > 0) %}
+          {{ govukSummaryList({
+            rows: [
+              {
+                key: { text: "IPv4 (A)" },
+                value: { html: dnsResult.ipv4.join("<br>") if dnsResult.ipv4.length > 0 else "None" }
+              },
+              {
+                key: { text: "IPv6 (AAAA)" },
+                value: { html: dnsResult.ipv6.join("<br>") if dnsResult.ipv6.length > 0 else "None" }
+              }
+            ]
+          }) }}
+        {% endif %}
+      </div>
+
+      <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+      {# ── PORT CHECK ───────────────────────────────────────────────────── #}
+      <h2 class="govuk-heading-m" id="port-result">Port check</h2>
+      <p class="govuk-body">Test TCP connectivity from the protected backend zone (like <code>nc</code>).</p>
+
+      {% if portResult %}
+        {% if portResult.reachable %}
+          {{ govukNotificationBanner({
+            type: "success",
+            html: "<p class=\"govuk-body\">Port <strong>" + portResult.port + "</strong> is open on <strong>" + portResult.host + "</strong></p>"
+          }) }}
+        {% else %}
+          {{ govukNotificationBanner({
+            type: "warning",
+            html: "<p class=\"govuk-body\">Port <strong>" + portResult.port + "</strong> is not reachable on <strong>" + portResult.host + "</strong>" + (": " + portResult.error if portResult.error else "") + "</p>"
+          }) }}
+        {% endif %}
+      {% endif %}
+
+      {% if portErrorMessage %}
+        {{ govukErrorSummary({
+          titleText: "There is a problem",
+          errorList: [{ text: portErrorMessage }]
+        }) }}
+      {% endif %}
+
+      <form method="post" action="/network#port-result" class="govuk-!-margin-bottom-6">
+        <input type="hidden" name="checkType" value="port">
+        {{ govukInput({
+          id: "portHost",
+          name: "host",
+          label: {
+            text: "Host or IP",
+            classes: "govuk-label--s"
+          },
+          hint: {
+            text: "e.g. api.os.uk or 10.0.0.1"
+          },
+          value: portHost
+        }) }}
+        {{ govukInput({
+          id: "portPort",
+          name: "port",
+          label: {
+            text: "Port",
+            classes: "govuk-label--s"
+          },
+          classes: "govuk-input--width-5",
+          type: "number",
+          attributes: { min: "1", max: "65535" },
+          value: portPort
+        }) }}
+        {{ govukButton({
+          text: "Check port",
+          classes: "govuk-button--secondary"
+        }) }}
+      </form>
+
+      <div></div>
+
+    </div>
+  </div>
+{% endblock %}
