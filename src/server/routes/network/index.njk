@@ -20,20 +20,22 @@
       <p class="govuk-body">Make a GET request from the protected backend zone.</p>
 
       {% if httpResult %}
-        {% if httpResult.squidBlocked %}
-          {{ govukNotificationBanner({
-            type: "warning",
-            html: "<p class=\"govuk-body\"><strong>Squid proxy blocked this request (307)</strong></p><p class=\"govuk-body\">The backend has no proxy ACL rule for this host. Add the domain to the <code>squid/cdp-platform-status-backend.json</code> config in <code>cdp-tenant-config</code>.</p>"
-          }) }}
-        {% elif httpResult.ok %}
+        {% if httpResult.ok %}
           {{ govukNotificationBanner({
             type: "success",
             html: "<p class=\"govuk-body\">Request completed in " + httpResult.totalMs + " ms</p>"
           }) }}
+        {% elif httpResult.squidBlocked %}
+          {{ govukNotificationBanner({
+            html: "<p class=\"govuk-body\"><strong>Squid proxy blocked this request (307)</strong></p><p class=\"govuk-body\">The backend has no proxy ACL rule for this host. Add the domain to the <code>squid/cdp-platform-status-backend.json</code> config in <code>cdp-tenant-config</code>.</p>"
+          }) }}
+        {% elif httpResult.error %}
+          {{ govukNotificationBanner({
+            html: "<p class=\"govuk-body\"><strong>Request failed</strong></p><p class=\"govuk-body\">" + httpResult.error + "</p>"
+          }) }}
         {% else %}
           {{ govukNotificationBanner({
-            type: "warning",
-            html: "<p class=\"govuk-body\">Request completed in " + httpResult.totalMs + " ms — non-success status</p>"
+            html: "<p class=\"govuk-body\">Request completed in " + httpResult.totalMs + " ms — non-success status " + httpResult.status + "</p>"
           }) }}
         {% endif %}
       {% endif %}
@@ -67,18 +69,24 @@
 
       <div>
         {% if httpResult %}
-          {{ govukSummaryList({
-            rows: [
-              {
-                key: { text: "Status" },
-                value: { text: httpResult.status + " " + httpResult.statusText }
-              },
-              {
-                key: { text: "Round trip" },
-                value: { text: httpResult.totalMs + " ms" }
-              }
-            ]
-          }) }}
+          {% set summaryRows = [] %}
+          {% if httpResult.status %}
+            {% set summaryRows = summaryRows.concat([{
+              key: { text: "Status" },
+              value: { text: httpResult.status + " " + httpResult.statusText }
+            }]) %}
+          {% endif %}
+          {% set summaryRows = summaryRows.concat([{
+            key: { text: "Round trip" },
+            value: { text: httpResult.totalMs + " ms" }
+          }]) %}
+          {% if httpResult.truncatedMessage %}
+            {% set summaryRows = summaryRows.concat([{
+              key: { text: "Body truncated" },
+              value: { text: httpResult.truncatedMessage }
+            }]) %}
+          {% endif %}
+          {{ govukSummaryList({ rows: summaryRows }) }}
 
           <h3 class="govuk-heading-s">Response headers</h3>
           {% if httpResult.headersText %}

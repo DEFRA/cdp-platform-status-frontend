@@ -48,7 +48,10 @@ async function handleHttpCheck(request, h) {
         headersText: Object.entries(json.headers ?? {})
           .map(([k, v]) => `${k}: ${v}`)
           .join('\n'),
-        totalMs: Math.round(performance.now() - start)
+        totalMs: Math.round(performance.now() - start),
+        truncatedMessage: json.truncated
+          ? `Response exceeded limit — showing first ${json.bodyLimitKb} KB`
+          : null
       }
     })
   } catch (error) {
