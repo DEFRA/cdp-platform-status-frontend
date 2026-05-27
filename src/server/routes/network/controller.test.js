@@ -36,6 +36,33 @@ describe('#network controllers', () => {
   })
 
   describe('HTTP check', () => {
+    test('Should render all HTTP client options', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/network',
+        headers: { Authorization: authHeader }
+      })
+
+      expect(statusCode).toBe(200)
+      expect(result).toEqual(expect.stringContaining('value="undici"'))
+      expect(result).toEqual(expect.stringContaining('value="node-fetch"'))
+      expect(result).toEqual(expect.stringContaining('value="axios"'))
+      expect(result).toEqual(expect.stringContaining('value="wreck"'))
+    })
+
+    test('Should select default routing option on initial page load', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'GET',
+        url: '/network',
+        headers: { Authorization: authHeader }
+      })
+
+      expect(statusCode).toBe(200)
+      expect(result).toMatch(
+        /(value="default"[^>]*checked|checked[^>]*value="default")/
+      )
+    })
+
     test('Should show backend response details with total round-trip time', async () => {
       callBackend.mockResolvedValueOnce({
         json: {
@@ -60,6 +87,39 @@ describe('#network controllers', () => {
       expect(result).toEqual(expect.stringContaining('Request completed in'))
       expect(result).toEqual(expect.stringContaining('200 OK'))
       expect(result).toEqual(expect.stringContaining('hello from target'))
+    })
+
+    test('Should persist selected client after submit', async () => {
+      callBackend.mockResolvedValueOnce({
+        json: {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          squidBlocked: false,
+          headers: { 'content-type': 'text/plain' },
+          body: 'hello from target',
+          truncated: false,
+          client: 'axios'
+        }
+      })
+
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/network',
+        payload: {
+          checkType: 'http',
+          url: 'https://www.gov.uk',
+          client: 'axios'
+        },
+        headers: { Authorization: authHeader }
+      })
+
+      expect(statusCode).toBe(200)
+      expect(result).toMatch(
+        /(value="axios"[^>]*checked|checked[^>]*value="axios")/
+      )
+      expect(result).toEqual(expect.stringContaining('Client'))
+      expect(result).toEqual(expect.stringContaining('axios'))
     })
 
     test('Should show Squid blocked warning when squidBlocked is true', async () => {
@@ -87,6 +147,44 @@ describe('#network controllers', () => {
         expect.stringContaining('Squid proxy blocked this request')
       )
       expect(result).toEqual(expect.stringContaining('cdp-tenant-config'))
+    })
+
+    test('Should return error when HTTP client is invalid', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/network',
+        payload: {
+          checkType: 'http',
+          url: 'https://www.gov.uk',
+          client: 'not-a-client'
+        },
+        headers: { Authorization: authHeader }
+      })
+
+      expect(statusCode).toBe(400)
+      expect(result).toEqual(
+        expect.stringContaining('Select a valid HTTP client')
+      )
+      expect(callBackend).not.toHaveBeenCalled()
+    })
+
+    test('Should return error when routing is invalid', async () => {
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/network',
+        payload: {
+          checkType: 'http',
+          url: 'https://www.gov.uk',
+          routing: 'not-a-route'
+        },
+        headers: { Authorization: authHeader }
+      })
+
+      expect(statusCode).toBe(400)
+      expect(result).toEqual(
+        expect.stringContaining('Select a valid routing option')
+      )
+      expect(callBackend).not.toHaveBeenCalled()
     })
 
     test('Should return error summary when backend HTTP check fails', async () => {
