@@ -31,7 +31,7 @@
           }) }}
         {% elif httpResult.error %}
           {{ govukNotificationBanner({
-            html: "<p class=\"govuk-body\"><strong>Request failed</strong></p><p class=\"govuk-body\">" + httpResult.error + "</p>"
+            html: "<p class=\"govuk-body\"><strong>Request failed</strong></p><p class=\"govuk-body\">" + httpResult.error + "</p>" + ("<p class=\"govuk-body\">Request completed in " + httpResult.durationMs + " ms</p>" if httpResult.durationMs is defined else "")
           }) }}
         {% else %}
           {{ govukNotificationBanner({
@@ -80,6 +80,12 @@
             key: { text: "Round trip" },
             value: { text: httpResult.totalMs + " ms" }
           }]) %}
+          {% if httpResult.durationMs is defined %}
+            {% set summaryRows = summaryRows.concat([{
+              key: { text: "Backend time" },
+              value: { text: httpResult.durationMs + " ms" }
+            }]) %}
+          {% endif %}
           {% if httpResult.truncatedMessage %}
             {% set summaryRows = summaryRows.concat([{
               key: { text: "Body truncated" },
@@ -156,19 +162,23 @@
       </form>
 
       <div>
-        {% if dnsResult and (dnsResult.ipv4.length > 0 or dnsResult.ipv6.length > 0) %}
-          {{ govukSummaryList({
-            rows: [
-              {
-                key: { text: "IPv4 (A)" },
-                value: { html: dnsResult.ipv4.join("<br>") if dnsResult.ipv4.length > 0 else "None" }
-              },
-              {
-                key: { text: "IPv6 (AAAA)" },
-                value: { html: dnsResult.ipv6.join("<br>") if dnsResult.ipv6.length > 0 else "None" }
-              }
-            ]
-          }) }}
+        {% if dnsResult %}
+          {% set dnsRows = [] %}
+          {% if dnsResult.durationMs is defined %}
+            {% set dnsRows = dnsRows.concat([{
+              key: { text: "Time taken" },
+              value: { text: dnsResult.durationMs + " ms" }
+            }]) %}
+          {% endif %}
+          {% set dnsRows = dnsRows.concat([{
+            key: { text: "IPv4 (A)" },
+            value: { html: dnsResult.ipv4.join("<br>") if dnsResult.ipv4.length > 0 else "None" }
+          }]) %}
+          {% set dnsRows = dnsRows.concat([{
+            key: { text: "IPv6 (AAAA)" },
+            value: { html: dnsResult.ipv6.join("<br>") if dnsResult.ipv6.length > 0 else "None" }
+          }]) %}
+          {{ govukSummaryList({ rows: dnsRows }) }}
         {% endif %}
       </div>
 
@@ -231,7 +241,24 @@
         }) }}
       </form>
 
-      <div></div>
+      <div>
+        {% if portResult %}
+          {% set portRows = [] %}
+          {% if portResult.durationMs is defined %}
+            {% set portRows = portRows.concat([{
+              key: { text: "Time taken" },
+              value: { text: portResult.durationMs + " ms" }
+            }]) %}
+          {% endif %}
+          {% if portResult.error %}
+            {% set portRows = portRows.concat([{
+              key: { text: "Error" },
+              value: { text: portResult.error }
+            }]) %}
+          {% endif %}
+          {{ govukSummaryList({ rows: portRows }) }}
+        {% endif %}
+      </div>
 
     </div>
   </div>

@@ -106,6 +106,27 @@ describe('#network controllers', () => {
         expect.stringContaining('HTTP check failed: Backend request failed')
       )
     })
+
+    test('Should show backend timeout duration when HTTP check returns error payload', async () => {
+      callBackend.mockResolvedValueOnce({
+        json: {
+          ok: false,
+          error: 'The operation was aborted',
+          durationMs: 10001
+        }
+      })
+
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/network',
+        payload: { checkType: 'http', url: 'https://www.gov.uk' },
+        headers: { Authorization: authHeader }
+      })
+
+      expect(statusCode).toBe(200)
+      expect(result).toEqual(expect.stringContaining('Request failed'))
+      expect(result).toEqual(expect.stringContaining('10001 ms'))
+    })
   })
 
   describe('DNS lookup', () => {
@@ -115,7 +136,8 @@ describe('#network controllers', () => {
           ok: true,
           hostname: 'www.gov.uk',
           ipv4: ['1.2.3.4'],
-          ipv6: []
+          ipv6: [],
+          durationMs: 42
         }
       })
 
@@ -128,6 +150,7 @@ describe('#network controllers', () => {
 
       expect(statusCode).toBe(200)
       expect(result).toEqual(expect.stringContaining('1.2.3.4'))
+      expect(result).toEqual(expect.stringContaining('42 ms'))
     })
 
     test('Should show error when DNS lookup fails', async () => {
@@ -158,7 +181,13 @@ describe('#network controllers', () => {
   describe('Port check', () => {
     test('Should show port open when reachable', async () => {
       callBackend.mockResolvedValueOnce({
-        json: { ok: true, host: 'api.os.uk', port: 443, reachable: true }
+        json: {
+          ok: true,
+          host: 'api.os.uk',
+          port: 443,
+          reachable: true,
+          durationMs: 42
+        }
       })
 
       const { result, statusCode } = await server.inject({
@@ -172,6 +201,7 @@ describe('#network controllers', () => {
       expect(result).toEqual(expect.stringContaining('Port'))
       expect(result).toEqual(expect.stringContaining('443'))
       expect(result).toEqual(expect.stringContaining('open'))
+      expect(result).toEqual(expect.stringContaining('42 ms'))
     })
 
     test('Should show port closed when not reachable', async () => {
