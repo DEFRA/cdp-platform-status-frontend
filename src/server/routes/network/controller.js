@@ -84,9 +84,7 @@ async function handleHttpCheck(request, h) {
   } catch (error) {
     request.logger.error(error)
     return renderPage(h, {
-      httpUrl: url,
-      httpClient: client,
-      httpRouting: rawRouting,
+      ...formState,
       httpErrorMessage: `HTTP check failed: ${error.message}`
     }).code(error.output?.statusCode ?? 500)
   }
