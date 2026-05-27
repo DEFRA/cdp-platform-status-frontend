@@ -4,6 +4,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
@@ -61,6 +62,63 @@
           },
           value: httpUrl
         }) }}
+        {{ govukRadios({
+          idPrefix: "client",
+          name: "client",
+          fieldset: {
+            legend: {
+              text: "HTTP client",
+              classes: "govuk-fieldset__legend--s"
+            }
+          },
+          value: httpClient,
+          items: [
+            {
+              value: "undici",
+              text: "undici (default)"
+            },
+            {
+              value: "node-fetch",
+              text: "node-fetch"
+            },
+            {
+              value: "axios",
+              text: "axios"
+            },
+            {
+              value: "wreck",
+              text: "wreck"
+            }
+          ]
+        }) }}
+        {{ govukRadios({
+          idPrefix: "routing",
+          name: "routing",
+          fieldset: {
+            legend: {
+              text: "Routing",
+              classes: "govuk-fieldset__legend--s"
+            }
+          },
+          value: httpRouting,
+          items: [
+            {
+              value: "default",
+              text: "Default (proxy via NODE_USE_ENV_PROXY)"
+            },
+            {
+              value: "proxy",
+              text: "Force via Squid proxy"
+            },
+            {
+              value: "direct",
+              text: "Force direct (bypass proxy)",
+              hint: {
+                text: "On CDP, direct connections to external URLs will usually time out. This is expected and confirms egress controls are working."
+              }
+            }
+          ]
+        }) }}
         {{ govukButton({
           text: "Run check",
           classes: "govuk-button--secondary"
@@ -74,6 +132,18 @@
             {% set summaryRows = summaryRows.concat([{
               key: { text: "Status" },
               value: { text: httpResult.status + " " + httpResult.statusText }
+            }]) %}
+          {% endif %}
+          {% if httpResult.client %}
+            {% set summaryRows = summaryRows.concat([{
+              key: { text: "Client" },
+              value: { text: httpResult.client }
+            }]) %}
+          {% endif %}
+          {% if httpResult.routing %}
+            {% set summaryRows = summaryRows.concat([{
+              key: { text: "Routing" },
+              value: { text: httpResult.routing }
             }]) %}
           {% endif %}
           {% set summaryRows = summaryRows.concat([{

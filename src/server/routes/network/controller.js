@@ -1,6 +1,16 @@
 import { config } from '#/config/config.js'
 import { callBackend } from '#/server/common/helpers/backend-client.js'
 
+const VALID_HTTP_CLIENTS = ['undici', 'node-fetch', 'axios', 'wreck']
+const VALID_ROUTING = ['default', 'proxy', 'direct']
+
+function renderHttpCheckError(h, viewModel, message) {
+  return renderPage(h, {
+    ...viewModel,
+    httpErrorMessage: message
+  }).code(400)
+}
+
 function renderPage(h, viewModel = {}) {
   return h.view('network/index', {
     pageTitle: 'Network check',
@@ -15,6 +25,8 @@ function renderPage(h, viewModel = {}) {
       }
     ],
     httpUrl: '',
+    httpClient: 'undici',
+    httpRouting: 'default',
     dnsHostname: '',
     portHost: '',
     portPort: 443,
@@ -24,12 +36,25 @@ function renderPage(h, viewModel = {}) {
 
 async function handleHttpCheck(request, h) {
   const url = String(request.payload?.url ?? '').trim()
+  const client = String(request.payload?.client ?? 'undici')
+  const rawRouting = String(request.payload?.routing ?? 'default')
+  const routing = rawRouting === 'default' ? undefined : rawRouting
+  const formState = {
+    httpUrl: url,
+    httpClient: client,
+    httpRouting: rawRouting
+  }
+
+  if (!VALID_HTTP_CLIENTS.includes(client)) {
+    return renderHttpCheckError(h, formState, 'Select a valid HTTP client')
+  }
+
+  if (!VALID_ROUTING.includes(rawRouting)) {
+    return renderHttpCheckError(h, formState, 'Select a valid routing option')
+  }
 
   if (!url) {
-    return renderPage(h, {
-      httpUrl: url,
-      httpErrorMessage: 'Enter a URL'
-    }).code(400)
+    return renderHttpCheckError(h, formState, 'Enter a URL')
   }
 
   const start = performance.now()
@@ -37,11 +62,13 @@ async function handleHttpCheck(request, h) {
   try {
     const { json } = await callBackend(
       `${config.get('backendUrl')}/network/check`,
-      { method: 'POST', body: JSON.stringify({ url }) }
+      { method: 'POST', body: JSON.stringify({ url, client, routing }) }
     )
 
     return renderPage(h, {
       httpUrl: url,
+      httpClient: json.client ?? client,
+      httpRouting: json.routing ?? rawRouting,
       httpResult: {
         ...json,
         body: (json.body ?? '').trim(),
@@ -57,7 +84,7 @@ async function handleHttpCheck(request, h) {
   } catch (error) {
     request.logger.error(error)
     return renderPage(h, {
-      httpUrl: url,
+      ...formState,
       httpErrorMessage: `HTTP check failed: ${error.message}`
     }).code(error.output?.statusCode ?? 500)
   }
