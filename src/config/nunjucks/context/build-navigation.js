@@ -1,5 +1,6 @@
 export const navItems = [
   { text: 'Home', href: '/' },
+  { text: 'Network check', href: '/network' },
   { text: 'Large logs', href: '/logs' },
   { text: 'Kill switch', href: '/kill' }
 ]
