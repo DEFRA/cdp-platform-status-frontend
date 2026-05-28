@@ -8,11 +8,17 @@ export const network = {
         {
           method: 'GET',
           path: '/network',
+          options: {
+            auth: false
+          },
           ...networkPageController
         },
         {
           method: 'POST',
           path: '/network',
+          options: {
+            auth: false
+          },
           ...submitNetworkController
         }
       ])
