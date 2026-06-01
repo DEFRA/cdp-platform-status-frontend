@@ -1,8 +1,6 @@
 import { GetWebIdentityTokenCommand, STSClient } from '@aws-sdk/client-sts'
 
-const client = new STSClient({
-  endpoint: 'http://localhost:4566'
-})
+const client = new STSClient()
 
 function requestToken(aud) {
   const input = {
