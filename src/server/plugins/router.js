@@ -7,6 +7,7 @@ import { kill } from '../routes/kill/index.js'
 import { health } from '../routes/health/index.js'
 import { serveStaticFiles } from './serve-static-files.js'
 import { config } from '#/config/config.js'
+import { sts } from '#/server/routes/sts/index.js'
 
 export const router = {
   plugin: {
@@ -19,6 +20,9 @@ export const router = {
 
       // Application specific routes, add your own routes here
       await server.register([home, network, logs, kill])
+
+      // temp endpoint for testing sts permissions
+      await server.register([sts])
 
       // Static assets
       if (!config.get('isProduction') && !config.get('isTest')) {
