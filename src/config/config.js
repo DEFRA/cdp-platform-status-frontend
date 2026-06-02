@@ -252,6 +252,14 @@ export const config = convict({
       default: 'x-cdp-request-id',
       env: 'TRACING_HEADER'
     }
+  },
+  aws: {
+    region: {
+      doc: 'AWS region for SDK clients',
+      format: String,
+      default: 'eu-west-2',
+      env: 'AWS_REGION'
+    }
   }
 })
 
