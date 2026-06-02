@@ -1,15 +1,5 @@
-import { GetWebIdentityTokenCommand, STSClient } from '@aws-sdk/client-sts'
-
-const client = new STSClient()
-
-function requestToken(aud) {
-  const input = {
-    SigningAlgorithm: 'RS256',
-    Audience: [aud]
-  }
-  const command = new GetWebIdentityTokenCommand(input)
-  return client.send(command)
-}
+import { callBackendWithJwt } from '#/server/common/helpers/backend-client.js'
+import { config } from '#/config/config.js'
 
 function renderPage(h, viewModel = {}) {
   return h.view('sts/index', {
@@ -29,16 +19,18 @@ function renderPage(h, viewModel = {}) {
 }
 
 export const tokenController = {
-  async handler(_request, h) {
-    const aud = _request.query.aud ?? 'cdp-platform-status-frontend'
+  async handler(request, h) {
     let response = {}
     try {
-      response = await requestToken(aud)
-      _request.logger.info(response)
+      response = await callBackendWithJwt(
+        request,
+        `${config.get('backendUrl')}/sts`
+      )
+      request.logger.info(response)
     } catch (err) {
-      _request.logger.error(err)
+      request.logger.error(err)
       response = 'Failed to get web identity token' + err.message
     }
-    return renderPage(h, { aud, token: response })
+    return renderPage(h, { token: response })
   }
 }

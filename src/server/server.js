@@ -16,6 +16,7 @@ import { secureContext } from '@defra/hapi-secure-context'
 import { contentSecurityPolicy } from './plugins/content-security-policy.js'
 import { metrics } from '@defra/cdp-metrics'
 import { auth } from './plugins/auth.js'
+import { awsClients } from '#/server/plugins/aws-clients.js'
 
 export async function createServer() {
   setupProxy()
@@ -59,6 +60,7 @@ export async function createServer() {
     requestLogger,
     requestTracing,
     metrics,
+    awsClients,
     secureContext,
     pulse,
     sessionCache,
