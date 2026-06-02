@@ -23,7 +23,7 @@ export const tokenController = {
     let response = {}
     try {
       response = await callBackendWithJwt(
-        request,
+        request.sts,
         `${config.get('backendUrl')}/sts`
       )
       request.logger.info(response)
