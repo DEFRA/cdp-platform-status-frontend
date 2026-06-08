@@ -4,6 +4,13 @@ import { callBackend } from '#/server/common/helpers/backend-client.js'
 const VALID_HTTP_CLIENTS = ['undici', 'node-fetch', 'axios', 'wreck']
 const VALID_ROUTING = ['default', 'proxy', 'direct']
 
+function buildBodyRedactedMessage(bodyLength) {
+  const parsedLength = Number(bodyLength)
+  const safeLength =
+    Number.isFinite(parsedLength) && parsedLength > 0 ? parsedLength : 0
+  return `${safeLength.toLocaleString('en-GB')} bytes (redacted in production)`
+}
+
 function renderHttpCheckError(h, viewModel, message) {
   return renderPage(h, {
     ...viewModel,
@@ -71,7 +78,10 @@ async function handleHttpCheck(request, h) {
       httpRouting: json.routing ?? rawRouting,
       httpResult: {
         ...json,
-        body: (json.body ?? '').trim(),
+        body: json.bodyRedacted ? '' : (json.body ?? '').trim(),
+        bodyRedactedMessage: json.bodyRedacted
+          ? buildBodyRedactedMessage(json.bodyLength)
+          : null,
         headersText: Object.entries(json.headers ?? {})
           .map(([k, v]) => `${k}: ${v}`)
           .join('\n'),

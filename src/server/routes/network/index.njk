@@ -162,6 +162,12 @@
               value: { text: httpResult.truncatedMessage }
             }]) %}
           {% endif %}
+          {% if httpResult.bodyRedactedMessage %}
+            {% set summaryRows = summaryRows.concat([{
+              key: { text: "Response body" },
+              value: { text: httpResult.bodyRedactedMessage }
+            }]) %}
+          {% endif %}
           {{ govukSummaryList({ rows: summaryRows }) }}
 
           <h3 class="govuk-heading-s">Response headers</h3>
@@ -176,10 +182,14 @@
 
           {% if not httpResult.squidBlocked %}
             <h3 class="govuk-heading-s">Response body</h3>
-            <div data-module="copy-text" class="govuk-!-margin-bottom-6">
-              <textarea readonly class="app-code-block app-code-block--bordered govuk-!-margin-bottom-2">{{ httpResult.body or "[empty]" }}</textarea>
-              <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-copy>Copy body</button>
-            </div>
+            {% if httpResult.bodyRedacted %}
+              <p class="govuk-body">{{ httpResult.bodyRedactedMessage }}</p>
+            {% else %}
+              <div data-module="copy-text" class="govuk-!-margin-bottom-6">
+                <textarea readonly class="app-code-block app-code-block--bordered govuk-!-margin-bottom-2">{{ httpResult.body or "[empty]" }}</textarea>
+                <button class="govuk-button govuk-button--secondary govuk-!-margin-bottom-0" data-copy>Copy body</button>
+              </div>
+            {% endif %}
           {% endif %}
         {% endif %}
       </div>
