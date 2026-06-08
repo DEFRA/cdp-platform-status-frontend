@@ -122,6 +122,37 @@ describe('#network controllers', () => {
       expect(result).toEqual(expect.stringContaining('axios'))
     })
 
+    test('Should show body length and hide copy control when response body is redacted', async () => {
+      callBackend.mockResolvedValueOnce({
+        json: {
+          ok: true,
+          status: 200,
+          statusText: 'OK',
+          squidBlocked: false,
+          headers: { 'content-type': 'text/plain' },
+          body: 'super secret response body',
+          bodyRedacted: true,
+          bodyLength: 12345
+        }
+      })
+
+      const { result, statusCode } = await server.inject({
+        method: 'POST',
+        url: '/network',
+        payload: { checkType: 'http', url: 'https://www.gov.uk' },
+        headers: { Authorization: authHeader }
+      })
+
+      expect(statusCode).toBe(200)
+      expect(result).toEqual(
+        expect.stringContaining('12,345 bytes (redacted in production)')
+      )
+      expect(result).not.toEqual(expect.stringContaining('Copy body'))
+      expect(result).not.toEqual(
+        expect.stringContaining('super secret response body')
+      )
+    })
+
     test('Should show Squid blocked warning when squidBlocked is true', async () => {
       callBackend.mockResolvedValueOnce({
         json: {
