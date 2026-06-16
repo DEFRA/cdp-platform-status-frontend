@@ -199,8 +199,6 @@ docker compose up --build -d
 - Backend: http://localhost:3101
 - Admin pages (`/logs`, `/kill`): username `admin`, password `local-dev-password`
 
-To run only the frontend on the host against compose infra/backend, copy `.env.example` to `.env` and use `npm run dev`.
-
 ### Dependabot
 
 We have added an example dependabot configuration file to the repository. You can enable it by renaming
