@@ -9,7 +9,12 @@ const adminOnlyHrefs = new Set(['/logs', '/kill'])
 
 export function buildNavigation(request) {
   const path = request?.path ?? ''
-  const isAdmin = request?.yar?.get?.('isAdmin') ?? false
+  let isAdmin = false
+  try {
+    isAdmin = request?.yar?.get?.('isAdmin') ?? false
+  } catch {
+    // Yar session may be uninitialised (e.g. unknown route before session middleware runs)
+  }
 
   return navItems
     .filter((item) => isAdmin || !adminOnlyHrefs.has(item.href))
