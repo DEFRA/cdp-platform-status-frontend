@@ -1,8 +1,12 @@
 import { vi } from 'vitest'
 import { navItems } from './build-navigation.js'
 
-function expectedNav(currentHref) {
-  return navItems.map((item) => ({
+function expectedNav(currentHref, isAdmin = false) {
+  const visibleItems = navItems.filter((item) =>
+    isAdmin ? true : !['/logs', '/kill'].includes(item.href)
+  )
+
+  return visibleItems.map((item) => ({
     ...item,
     current: item.href === currentHref
   }))

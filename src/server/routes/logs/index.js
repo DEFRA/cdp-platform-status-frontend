@@ -8,11 +8,21 @@ export const logs = {
         {
           method: 'GET',
           path: '/logs',
+          options: {
+            auth: {
+              mode: 'required'
+            }
+          },
           ...logsPageController
         },
         {
           method: 'POST',
           path: '/logs',
+          options: {
+            auth: {
+              mode: 'required'
+            }
+          },
           ...generateLogsController
         }
       ])

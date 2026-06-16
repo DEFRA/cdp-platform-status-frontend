@@ -5,11 +5,17 @@ export const navItems = [
   { text: 'Kill switch', href: '/kill' }
 ]
 
+const adminOnlyHrefs = new Set(['/logs', '/kill'])
+
 export function buildNavigation(request) {
   const path = request?.path ?? ''
-  return navItems.map((item) => ({
-    ...item,
-    current:
-      path === item.href || (item.href !== '/' && path.startsWith(item.href))
-  }))
+  const isAdmin = request?.yar?.get?.('isAdmin') ?? false
+
+  return navItems
+    .filter((item) => isAdmin || !adminOnlyHrefs.has(item.href))
+    .map((item) => ({
+      ...item,
+      current:
+        path === item.href || (item.href !== '/' && path.startsWith(item.href))
+    }))
 }

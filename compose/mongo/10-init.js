@@ -1,6 +1,2 @@
-// MongoDB init script
-// This can be used for inserting local test data when mongo starts up
-
-// Example:
-// db = db.getSiblingDB('cdp-node-backend-template')
-// db.foo.insertOne({bar: "baz"})
+// Ensures the application database exists when Mongo starts.
+db = db.getSiblingDB('cdp-platform-status-backend')

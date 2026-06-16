@@ -1,4 +1,4 @@
-function renderCheck(result) {
+function renderStatus(result) {
   const isOk = result.status === 'ok'
   const ops = result.operations
   const isPartial = !isOk && ops && Object.values(ops).some((s) => s === 'ok')
@@ -13,6 +13,12 @@ function renderCheck(result) {
   const hint = result.reason
     ? `<p class="govuk-hint govuk-!-margin-top-1">${result.reason}</p>`
     : ''
+
+  return tag + hint
+}
+
+function renderOps(result) {
+  const ops = result.operations
   const opsList = ops
     ? `<ul class="app-status-ops">${Object.entries(ops)
         .map(([op, state]) => {
@@ -21,21 +27,28 @@ function renderCheck(result) {
         })
         .join('')}</ul>`
     : ''
-  return tag + hint + opsList
+
+  return opsList
 }
 
 function applyChecks(data) {
   Object.entries(data.checks).forEach(([name, result]) => {
-    const el = document.querySelector(`[data-check="${name}"]`)
-    if (el) {
-      el.innerHTML = renderCheck(result)
+    const statusEl = document.querySelector(`[data-check-status="${name}"]`)
+    const opsEl = document.querySelector(`[data-check-ops="${name}"]`)
+
+    if (statusEl) {
+      statusEl.innerHTML = renderStatus(result)
+    }
+
+    if (opsEl) {
+      opsEl.innerHTML = renderOps(result)
     }
   })
 }
 
 function markAllDown(names) {
   names.forEach((name) => {
-    const el = document.querySelector(`[data-check="${name}"]`)
+    const el = document.querySelector(`[data-check-status="${name}"]`)
     if (el) {
       el.innerHTML = '<strong class="govuk-tag govuk-tag--red">DOWN</strong>'
     }

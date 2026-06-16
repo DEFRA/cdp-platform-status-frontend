@@ -1,13 +1,14 @@
-version: '3.4'
 services:
+  # Floci emulates AWS (S3, SQS, SNS) for local development — https://floci.io
   floci:
     image: hectorvent/floci:latest-aws
     ports:
       - '4566:4566'
     env_file:
-      - 'compose/aws.env'
+      - compose/aws.env
     environment:
       FLOCI_DEFAULT_REGION: eu-west-2
+      FLOCI_HOSTNAME: floci
     volumes:
       - ./compose/floci/start.d:/etc/floci/init/start.d:ro
     networks:
@@ -22,69 +23,79 @@ services:
 
   mongodb:
     image: mongo:7.0.28
-    networks:
-      - cdp-tenant
     ports:
       - '27017:27017'
     volumes:
       - ./compose/mongo:/docker-entrypoint-initdb.d:ro
       - mongodb-data:/data
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.hello().ok"]
+      test: ['CMD', 'mongosh', '--eval', 'db.hello().ok']
       interval: 10s
       timeout: 5s
       retries: 3
       start_period: 30s
+    networks:
+      - cdp-tenant
 
-  ################################################################################
-
-  your-frontend:
-    build: ./
+  cdp-platform-status-backend:
+    build:
+      context: ../cdp-platform-status-backend
+      target: development
     ports:
-      - '3000:3000'
-    links:
-      - 'floci:floci'
-      - 'redis:redis'
+      - '3101:3101'
+    depends_on:
+      floci:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+    env_file:
+      - compose/aws.env
+      - compose/app.env
+    environment:
+      PORT: 3101
+      NODE_ENV: development
+      MONGO_URI: mongodb://mongodb:27017/
+      AWS_ENDPOINT_URL: http://floci:4566
+      S3_FORCE_PATH_STYLE: true
+      S3_BUCKET: platform-status
+      SQS_QUEUE_URL: http://floci:4566/000000000000/platform_status
+      SNS_TOPIC_ARN: arn:aws:sns:eu-west-2:000000000000:platform_status
+    volumes:
+      - ../cdp-platform-status-backend/src:/home/node/src
+      - ../cdp-platform-status-backend/package.json:/home/node/package.json
+    networks:
+      - cdp-tenant
+
+  cdp-platform-status-frontend:
+    build:
+      context: .
+      target: development
+    ports:
+      - '3100:3100'
     depends_on:
       floci:
         condition: service_healthy
       redis:
         condition: service_started
+      cdp-platform-status-backend:
+        condition: service_started
     env_file:
-      - 'compose/aws.env'
+      - compose/aws.env
+      - compose/app.env
     environment:
-      PORT: 3000
-      NODE_ENV: production
+      PORT: 3100
+      NODE_ENV: development
+      BACKEND_URL: http://cdp-platform-status-backend:3101
       REDIS_HOST: redis
       LOG_FORMAT: pino-pretty
       SESSION_COOKIE_SECURE: false
       USE_SINGLE_INSTANCE_CACHE: true
       REDIS_TLS: false
+    volumes:
+      - ./src:/home/node/src
+      - ./package.json:/home/node/package.json
     networks:
       - cdp-tenant
-
-  # your-backend:
-  #   image: defradigital/your-backend:${YOUR_BACKEND_VERSION:-latest}
-  #   ports:
-  #     - '3555:3555'
-  #   links:
-  #     - 'foci:floci'
-  #     - 'mongodb:mongodb'
-  #   depends_on:
-  #     floci:
-  #       condition: service_healthy
-  #     mongodb:
-  #       condition: service_started
-  #   env_file:
-  #     - 'compose/aws.env'
-  #   environment:
-  #     PORT: 3001
-  #     NODE_ENV: development
-  #     MONGO_URI: mongodb://mongodb:27017/
-  #   networks:
-  #     - cdp-tenant
-
-################################################################################
 
 volumes:
   mongodb-data:
@@ -92,3 +103,4 @@ volumes:
 networks:
   cdp-tenant:
     driver: bridge
+    name: cdp-tenant

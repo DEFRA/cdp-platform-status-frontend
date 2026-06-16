@@ -181,17 +181,25 @@ docker run -p 3000:3000 cdp-platform-status-frontend
 
 ### Docker Compose
 
-A local environment with:
+Full local stack (infra + backend + frontend) from this repository:
 
-- Floci (replacing Localstack) for AWS services (S3, SQS)
+- Floci for AWS services (S3, SQS, SNS)
 - Redis
 - MongoDB
-- This service.
-- A commented out backend example.
+- `cdp-platform-status-backend` (built from `../cdp-platform-status-backend`)
+- `cdp-platform-status-frontend`
+
+Auth and backend URL for compose are in [compose/app.env](./compose/app.env). You do not need a root `.env` file for `docker compose`.
 
 ```bash
 docker compose up --build -d
 ```
+
+- Frontend: http://localhost:3100
+- Backend: http://localhost:3101
+- Admin pages (`/logs`, `/kill`): username `admin`, password `local-dev-password`
+
+To run only the frontend on the host against compose infra/backend, copy `.env.example` to `.env` and use `npm run dev`.
 
 ### Dependabot
 
