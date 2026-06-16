@@ -49,6 +49,8 @@ describe('#buildNavigation', () => {
     ['Large logs', '/logs'],
     ['Kill switch', '/kill']
   ])('Should highlight %s nav item when on %s page', (_, path) => {
-    expect(buildNavigation(request(path, true))).toEqual(expectedNav(path, true))
+    expect(buildNavigation(request(path, true))).toEqual(
+      expectedNav(path, true)
+    )
   })
 })
