@@ -17,7 +17,7 @@ export const auth = {
     register: async (server) => {
       await server.register(Basic)
       server.auth.strategy('basic', 'basic', { validate })
-      server.auth.default('basic')
+      server.auth.default({ strategy: 'basic', mode: 'try' })
     }
   }
 }

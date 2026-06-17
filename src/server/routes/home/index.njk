@@ -7,50 +7,66 @@
 
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <dl class="govuk-summary-list" data-module="status-dashboard">
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">Frontend to backend</dt>
-          <dd class="govuk-summary-list__value" data-check="backend">
-            <span class="govuk-hint">Checking&hellip;</span>
-          </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">MongoDB</dt>
-          <dd class="govuk-summary-list__value" data-check="mongo">
-            <span class="govuk-hint">Checking&hellip;</span>
-          </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">Redis</dt>
-          <dd class="govuk-summary-list__value" data-check="redis">
-            <span class="govuk-hint">Checking&hellip;</span>
-          </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">Squid proxy</dt>
-          <dd class="govuk-summary-list__value" data-check="squid">
-            <span class="govuk-hint">Checking&hellip;</span>
-          </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">S3</dt>
-          <dd class="govuk-summary-list__value" data-check="s3">
-            <span class="govuk-hint">Checking&hellip;</span>
-          </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">SQS</dt>
-          <dd class="govuk-summary-list__value" data-check="sqs">
-            <span class="govuk-hint">Checking&hellip;</span>
-          </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key">SNS</dt>
-          <dd class="govuk-summary-list__value" data-check="sns">
-            <span class="govuk-hint">Checking&hellip;</span>
-          </dd>
-        </div>
-      </dl>
+      <table class="govuk-table" data-module="status-dashboard">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Service</th>
+            <th scope="col" class="govuk-table__header">Status</th>
+            <th scope="col" class="govuk-table__header">Operations</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Frontend to backend</th>
+            <td class="govuk-table__cell" data-check-status="backend">
+              <span class="govuk-hint">Checking&hellip;</span>
+            </td>
+            <td class="govuk-table__cell" data-check-ops="backend"></td>
+          </tr>
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">MongoDB</th>
+            <td class="govuk-table__cell" data-check-status="mongo">
+              <span class="govuk-hint">Checking&hellip;</span>
+            </td>
+            <td class="govuk-table__cell" data-check-ops="mongo"></td>
+          </tr>
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Redis</th>
+            <td class="govuk-table__cell" data-check-status="redis">
+              <span class="govuk-hint">Checking&hellip;</span>
+            </td>
+            <td class="govuk-table__cell" data-check-ops="redis"></td>
+          </tr>
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">Squid proxy</th>
+            <td class="govuk-table__cell" data-check-status="squid">
+              <span class="govuk-hint">Checking&hellip;</span>
+            </td>
+            <td class="govuk-table__cell" data-check-ops="squid"></td>
+          </tr>
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">S3</th>
+            <td class="govuk-table__cell" data-check-status="s3">
+              <span class="govuk-hint">Checking&hellip;</span>
+            </td>
+            <td class="govuk-table__cell" data-check-ops="s3"></td>
+          </tr>
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">SQS</th>
+            <td class="govuk-table__cell" data-check-status="sqs">
+              <span class="govuk-hint">Checking&hellip;</span>
+            </td>
+            <td class="govuk-table__cell" data-check-ops="sqs"></td>
+          </tr>
+          <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header">SNS</th>
+            <td class="govuk-table__cell" data-check-status="sns">
+              <span class="govuk-hint">Checking&hellip;</span>
+            </td>
+            <td class="govuk-table__cell" data-check-ops="sns"></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 {% endblock %}

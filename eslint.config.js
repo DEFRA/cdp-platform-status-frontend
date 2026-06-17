@@ -2,7 +2,7 @@ import neostandard from 'neostandard'
 
 const config = neostandard({
   env: ['node', 'vitest'],
-  ignores: [...neostandard.resolveIgnoresFromGitignore()],
+  ignores: [...neostandard.resolveIgnoresFromGitignore(), 'compose/**'],
   noJsx: true,
   noStyle: true
 })

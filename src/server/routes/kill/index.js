@@ -8,11 +8,21 @@ export const kill = {
         {
           method: 'GET',
           path: '/kill',
+          options: {
+            auth: {
+              mode: 'required'
+            }
+          },
           ...killPageController
         },
         {
           method: 'POST',
           path: '/kill',
+          options: {
+            auth: {
+              mode: 'required'
+            }
+          },
           ...triggerKillController
         }
       ])
